@@ -2,8 +2,13 @@
 
 from selenium import webdriver
 from WriterWrapper import WriterWrapper
-import configparser
 from time import sleep
+import configparser
+import csv
+import os
+
+
+DATA_PATH = './data'
 
 
 def get_driver(config_file_path: str) -> webdriver.Chrome:
@@ -14,6 +19,21 @@ def get_driver(config_file_path: str) -> webdriver.Chrome:
     driver = webdriver.Chrome(config['DRIVER']['PATH'], chrome_options=chrome_options)
     driver.implicitly_wait(3)
     return driver
+
+
+def iso2sec(iso: str) -> int:
+    arr = iso.split(':')
+    len_arr = len(arr)
+    if len_arr == 1:
+        arr = ['0', '0'] + arr
+    elif len_arr == 2:
+        arr = ['0'] + arr
+    elif len_arr == 3:
+        pass
+    else:
+        raise Exception('len_arr < 3, arr: {}'.format(arr))
+
+    return int(arr[0]) * 60 * 60 + int(arr[1]) * 60 + int(arr[2])
 
 
 class BaseCrawler:
@@ -36,7 +56,7 @@ class VideoURLCrawler(BaseCrawler):
         r = []
 
         for _ in range(6):
-            sleep(0.5)
+            sleep(1)
             self.driver.execute_script('return window.scrollBy(0,1000)')
 
         for div in self.driver.find_elements_by_css_selector('#dismissable'):
@@ -56,7 +76,7 @@ class VideoURLCrawler(BaseCrawler):
         return r
 
     def export(self):
-        writer = WriterWrapper('./data/VideoURL', self.fieldnames)
+        writer = WriterWrapper(os.path.join(DATA_PATH, 'VideoURL'), self.fieldnames)
         for line in self.run():
             writer.write_row(line)
         writer.close()
@@ -66,11 +86,37 @@ class ChatCrawler(BaseCrawler):
 
     def __init__(self, config_file_path: str):
         super().__init__(config_file_path)
+        self.urls = []
+
+    def get_urls(self):
+        video_url_filename = [os.path.join(DATA_PATH, f) for f in os.listdir(DATA_PATH)
+                              if f.startswith('VideoURL')][0]
+        reader = csv.DictReader(open(video_url_filename, 'r', encoding='utf-8'))
+        return list(reader)
 
     def run(self):
+        for url_dict in self.get_urls():
+            self.run_one(url_dict)
+            exit()
+
+    def run_one(self, url_dict: dict):
+        title, video_url, time = url_dict['title'], url_dict['video_url'], url_dict['time']
+        time_in_sec = iso2sec(time)
+
         self.driver = get_driver(self.config_file_path)
+        self.driver.get(video_url)
+
+        sleep(5)
+        iframe = self.driver.find_element_by_css_selector('#chatframe')
+        self.driver.switch_to.frame(iframe)
+
+        # TODO: Implement here
+        for emt in self.driver.find_elements_by_css_selector('yt-live-chat-text-message-renderer'):
+            print(emt)
+
+        self.driver.switch_to.default_content()
 
 
 if __name__ == '__main__':
-    crawler = VideoURLCrawler('./config.ini')
+    crawler = ChatCrawler('./config.ini')
     crawler.run()
