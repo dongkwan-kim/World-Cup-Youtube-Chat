@@ -24,14 +24,10 @@ def get_driver(config_file_path: str) -> webdriver.Chrome:
 def iso2sec(iso: str) -> int:
     arr = iso.split(':')
     len_arr = len(arr)
-    if len_arr == 1:
-        arr = ['0', '0'] + arr
-    elif len_arr == 2:
-        arr = ['0'] + arr
-    elif len_arr == 3:
-        pass
+    if len_arr <= 3:
+        arr = ['0'] * (3 - len_arr) + arr
     else:
-        raise Exception('len_arr < 3, arr: {}'.format(arr))
+        raise Exception('len_arr > 3, arr: {}'.format(arr))
 
     return int(arr[0]) * 60 * 60 + int(arr[1]) * 60 + int(arr[2])
 
