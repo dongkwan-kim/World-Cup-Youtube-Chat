@@ -1,2 +1,3 @@
 orderedset==2.0.1
 selenium==3.13.0
+termcolor==1.1.0
