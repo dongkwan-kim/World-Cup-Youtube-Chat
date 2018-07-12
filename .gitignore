@@ -239,3 +239,4 @@ pip-selfcheck.json
 # End of https://www.gitignore.io/api/vim,macos,python,virtualenv,pycharm+all
 
 *.ini
+*.csv
