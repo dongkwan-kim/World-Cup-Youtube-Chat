@@ -6,6 +6,10 @@ import configparser
 
 
 def try_except_with_sleep(f):
+    """
+    :param f: function that use this decorator
+    :return:
+    """
     def wrapper(*args, **kwargs):
         try:
             sleep(0.6)
@@ -17,6 +21,13 @@ def try_except_with_sleep(f):
 
 
 def get_driver(config_file_path: str) -> webdriver.Chrome:
+    """
+    :param config_file_path: path of .ini file
+        config.ini
+            [Driver]
+            PATH="Something"
+    :return: webdriver.Chrome
+    """
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--incognito")
     config = configparser.ConfigParser()

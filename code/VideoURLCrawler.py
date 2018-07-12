@@ -10,18 +10,27 @@ DATA_PATH = '../data'
 
 class VideoURLCrawler(BaseCrawler):
 
-    def __init__(self, config_file_path: str, target_url: str):
+    def __init__(self, config_file_path: str, target_url: str, number_of_scroll: int=6):
+        """
+        :param config_file_path: path of .ini file
+            config.ini
+                [Driver]
+                PATH="Something"
+        :param target_url: the url of video list.
+        :param number_of_scroll: number of scrolls to load a video list.
+        """
         super().__init__(config_file_path)
         self.url = target_url
         self.fieldnames = ['title', 'video_url', 'time']
         self.prefix = 'VideoURL'
+        self.number_of_scroll = number_of_scroll
 
-    def run(self):
+    def run(self) -> list:
         self.driver = get_driver(self.config_file_path)
         self.driver.get(self.url)
         r = []
 
-        for _ in range(6):
+        for _ in range(self.number_of_scroll):
             sleep(1)
             self.driver.execute_script('return window.scrollBy(0,1000)')
 

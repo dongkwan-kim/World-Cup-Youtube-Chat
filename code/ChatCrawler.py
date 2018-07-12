@@ -21,15 +21,30 @@ DATA_PATH = '../data'
 
 class ChatCrawler(BaseCrawler):
 
-    def __init__(self, config_file_path: str):
+    def __init__(self, config_file_path: str, video_speed_rate: float=3.3, interval_to_crawl: int=30):
+        """
+        :param config_file_path: path of .ini file
+            config.ini
+                [Driver]
+                PATH="Something"
+        :param video_speed_rate: video speed
+        :param interval_to_crawl: interval to crawl in sec
+
+        We will recommend that interval_to_crawl * video_speed_rate < 2*60 ~ 3*60 (2 ~ 3 min)
+        """
         super().__init__(config_file_path)
         self.urls = []
         self.prefix = 'Chat'
         self.fieldnames = ['time_stamp', 'author_name', 'message', 'img']
         self.chat_iframe = None
-        self.video_speed_rate = 3.3
+        self.video_speed_rate = video_speed_rate
+        self.interval_to_crawl = interval_to_crawl
 
-    def get_urls(self):
+        if video_speed_rate * interval_to_crawl >= 2*60:
+            print('We recommend that interval_to_crawl * video_speed_rate < 2*60 ~ 3*60 (2 ~ 3 min)',
+                  'Yours is {0}'.format(video_speed_rate*interval_to_crawl))
+
+    def get_urls(self) -> csv.DictReader:
         video_url_filename = [os.path.join(DATA_PATH, f) for f in os.listdir(DATA_PATH)
                               if f.startswith('VideoURL')][0]
         reader = csv.DictReader(open(video_url_filename, 'r', encoding='utf-8'))
@@ -86,7 +101,11 @@ class ChatCrawler(BaseCrawler):
         for url_dict in self.get_urls():
             self.run_one(url_dict)
 
-    def run_one(self, url_dict: dict):
+    def run_one(self, url_dict: dict) -> list:
+        """
+        :param url_dict: {'title', 'video_url', 'time'}
+        :return: list of dict {'time_stamp', 'author_name', 'message', 'img'}
+        """
         title, video_url, play_time = url_dict['title'], url_dict['video_url'], url_dict['time']
         time_in_sec = iso2sec(play_time)
 
@@ -116,11 +135,10 @@ class ChatCrawler(BaseCrawler):
         self.driver.set_window_position(-1800, 0)
 
         r_set = OrderedSet()
-        interval = 30
-        epochs = int(time_in_sec/self.video_speed_rate/interval) + 1
+        epochs = int(time_in_sec/self.video_speed_rate/self.interval_to_crawl) + 1
         for i in range(epochs):
 
-            sleep(interval)
+            sleep(self.interval_to_crawl)
 
             # Pause
             self.click_play_toggle()
