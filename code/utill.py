@@ -11,8 +11,8 @@ def try_except_with_sleep(f):
             sleep(0.6)
             f(*args, **kwargs)
             sleep(0.6)
-        except:
-            print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), file=sys.stderr)
+        except Exception as e:
+            print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), e, file=sys.stderr)
     return wrapper
 
 

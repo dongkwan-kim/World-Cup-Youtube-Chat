@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from code.utill import try_except_with_sleep, get_driver, iso2sec
-from code.BaseCrawler import BaseCrawler
-from code.WriterWrapper import WriterWrapper
+from utill import try_except_with_sleep, get_driver, iso2sec
+from BaseCrawler import BaseCrawler
+from WriterWrapper import WriterWrapper
 from time import sleep, time
 from multiprocessing import Process
 import csv
@@ -52,6 +52,7 @@ class ChatCrawler(BaseCrawler):
             'document.getElementsByTagName("video")[0].playbackRate = {0}'.format(self.video_speed_rate)
         )
 
+    @try_except_with_sleep
     def show_timestamp(self):
         btn_top = self.driver.find_element_by_css_selector('#overflow')
         btn_top.click()
@@ -59,14 +60,11 @@ class ChatCrawler(BaseCrawler):
         btn_bottom = self.driver.find_element_by_css_selector('#items > ytd-menu-service-item-renderer')
         btn_bottom.click()
 
+    @try_except_with_sleep
     def click_show_more(self):
-        try:
-            sleep(0.5)
-            btn_show_more = self.driver.find_element_by_css_selector('#show-more')
+        btn_show_more = self.driver.find_element_by_css_selector('#show-more')
+        if btn_show_more.is_displayed():
             btn_show_more.click()
-            sleep(0.5)
-        except:
-            pass
 
     @try_except_with_sleep
     def click_play_toggle(self):
@@ -81,12 +79,8 @@ class ChatCrawler(BaseCrawler):
         self.driver.switch_to.frame(self.chat_iframe)
 
     def get_element_by_id(self, parent_emt, html_id):
-        try:
-            r_emt = parent_emt.find_element_by_id(html_id)
-            return r_emt
-        except Exception as e:
-            print('Error: {0} of {1}'.format(html_id, parent_emt.text), str(e), file=sys.stderr)
-            return 'Error'
+        r_emt = parent_emt.find_element_by_id(html_id)
+        return r_emt
 
     def run(self):
         for url_dict in self.get_urls():
@@ -116,6 +110,7 @@ class ChatCrawler(BaseCrawler):
         self.driver.switch_to.frame(self.chat_iframe)
 
         self.show_timestamp()
+
         self.click_show_more()
 
         self.driver.set_window_position(-1800, 0)
@@ -158,7 +153,7 @@ class ChatCrawler(BaseCrawler):
 
         self.driver.switch_to.default_content()
         self.driver.close()
-        cprint('P{0} | {2} | End | {1}'.format(os.getpid(), title, play_time), 'green')
+        cprint('P{0} | {2} | End | {1}'.format(os.getpid(), title, play_time), 'blue')
 
         return [{
             'time_stamp': tup[0],
@@ -185,22 +180,22 @@ class ChatCrawler(BaseCrawler):
             writer.write_row(line)
         writer.close()
 
-    def export_with_multiprocess(self, processes=4):
+    def export_with_multiprocess(self, processes=4, resume_interval_in_min=5):
         print('Start crawling with {0} processes'.format(processes))
 
         process_list = []
 
         for url_dict in self.get_urls():
-            proc = Process(target=self.export_one, args=(url_dict,))
-            proc.start()
-            process_list.append(proc)
+            process = Process(target=self.export_one, args=(url_dict,))
+            process.start()
+            process_list.append(process)
 
             while len(process_list) >= processes:
-                sleep(60*5)
+                sleep(60*resume_interval_in_min)
                 process_list = [process for process in process_list if process.is_alive()]
 
-        for proc in process_list:
-            proc.join()
+        for process in process_list:
+            process.join()
 
         print('Crawling ends')
 
