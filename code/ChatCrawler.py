@@ -1,107 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from selenium import webdriver
-from WriterWrapper import WriterWrapper
+from code.utill import try_except_with_sleep, get_driver, iso2sec
+from code.BaseCrawler import BaseCrawler
+from code.WriterWrapper import WriterWrapper
 from time import sleep, time
 from multiprocessing import Process
-import configparser
 import csv
 import os
 import sys
 import random
-from termcolor import colored, cprint
+from termcolor import cprint
 try:
     from orderedset import OrderedSet
 except:
     pass
 
-DATA_PATH = './data'
 
-
-def try_except_with_sleep(f):
-    def wrapper(*args, **kwargs):
-        try:
-            sleep(0.6)
-            f(*args, **kwargs)
-            sleep(0.6)
-        except:
-            print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), file=sys.stderr)
-    return wrapper
-
-
-def get_driver(config_file_path: str) -> webdriver.Chrome:
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--incognito")
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
-    driver = webdriver.Chrome(config['DRIVER']['PATH'], chrome_options=chrome_options)
-    driver.implicitly_wait(3)
-    return driver
-
-
-def iso2sec(iso: str) -> int:
-    arr = iso.split(':')
-    len_arr = len(arr)
-    if len_arr <= 3:
-        arr = ['0'] * (3 - len_arr) + arr
-    else:
-        raise Exception('len_arr > 3, arr: {}'.format(arr))
-
-    return int(arr[0]) * 60 * 60 + int(arr[1]) * 60 + int(arr[2])
-
-
-class BaseCrawler:
-
-    def __init__(self, config_file_path: str):
-        self.driver = None
-        self.prefix = None
-        self.fieldnames = []
-        self.config_file_path = config_file_path
-
-    def run(self):
-        raise NotImplementedError
-
-
-class VideoURLCrawler(BaseCrawler):
-
-    def __init__(self, config_file_path: str):
-        super().__init__(config_file_path)
-        self.url = 'https://www.youtube.com/user/FIFATV/videos?live_view=503&sort=dd&view=2&shelf_id=0'
-        self.fieldnames = ['title', 'video_url', 'time']
-        self.prefix = 'VideoURL'
-
-    def run(self):
-        self.driver = get_driver(self.config_file_path)
-        self.driver.get(self.url)
-        r = []
-
-        for _ in range(6):
-            sleep(1)
-            self.driver.execute_script('return window.scrollBy(0,1000)')
-
-        for div in self.driver.find_elements_by_css_selector('#dismissable'):
-
-            anchor = div.find_element_by_id('video-title')
-            play_time = div.find_element_by_class_name('ytd-thumbnail-overlay-time-status-renderer').text
-
-            title = anchor.text
-            video_url = anchor.get_attribute('href')
-            r.append({
-                'title': title,
-                'video_url': video_url,
-                'time': play_time,
-            })
-            print(title, video_url, play_time)
-
-        self.driver.close()
-
-        return r
-
-    def export(self):
-        writer = WriterWrapper(os.path.join(DATA_PATH, self.prefix), self.fieldnames)
-        for line in self.run():
-            writer.write_row(line)
-        writer.close()
+DATA_PATH = '../data'
 
 
 class ChatCrawler(BaseCrawler):
