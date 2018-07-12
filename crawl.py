@@ -9,6 +9,7 @@ import csv
 import os
 import sys
 import random
+from termcolor import colored, cprint
 try:
     from orderedset import OrderedSet
 except:
@@ -181,9 +182,9 @@ class ChatCrawler(BaseCrawler):
         time_in_sec = iso2sec(play_time)
 
         wait_to_start, wait_to_crawl = 50*random.random()*random.random(), random.randrange(5, 8)
-        print('P{0} | {4} | {1} | wait_to_start: {2}, wait_to_crawl: {3}'.format(
+        cprint('P{0} | {4} | Begin | {1} | wait_to_start: {2}, wait_to_crawl: {3}'.format(
             os.getpid(), title, wait_to_start, wait_to_crawl, play_time
-        ))
+        ), 'green')
 
         sleep(wait_to_start)
 
@@ -242,7 +243,7 @@ class ChatCrawler(BaseCrawler):
 
         self.driver.switch_to.default_content()
         self.driver.close()
-        print('P{0} | {2} | {1} | Finished'.format(os.getpid(), title, play_time))
+        cprint('P{0} | {2} | End | {1}'.format(os.getpid(), title, play_time), 'green')
 
         return [{
             'time_stamp': tup[0],
