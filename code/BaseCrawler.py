@@ -6,5 +6,5 @@ class BaseCrawler:
         self.fieldnames = []
         self.config_file_path = config_file_path
 
-    def run(self):
+    def run(self, *args, **kwargs):
         raise NotImplementedError

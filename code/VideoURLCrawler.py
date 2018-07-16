@@ -25,7 +25,11 @@ class VideoURLCrawler(BaseCrawler):
         self.prefix = 'VideoURL'
         self.number_of_scroll = number_of_scroll
 
-    def run(self) -> list:
+    def run(self, search_text: str=None) -> list:
+        """
+        :param search_text: text to search
+        :return: list of videos that contain 'search_text'
+        """
         self.driver = get_driver(self.config_file_path)
         self.driver.get(self.url)
         r = []
@@ -40,28 +44,33 @@ class VideoURLCrawler(BaseCrawler):
             play_time = div.find_element_by_class_name('ytd-thumbnail-overlay-time-status-renderer').text
 
             title = anchor.text
-            video_url = anchor.get_attribute('href')
-            r.append({
-                'title': title,
-                'video_url': video_url,
-                'time': play_time,
-            })
-            print(title, video_url, play_time)
+            video_url: str = anchor.get_attribute('href')
+            if (not search_text) or (search_text in title.lower()):
+                r.append({
+                    'title': title,
+                    'video_url': video_url,
+                    'time': play_time,
+                })
+                print(title, video_url, play_time)
 
         self.driver.close()
 
         return r
 
-    def export(self):
+    def export(self, search_text: str=None):
+        """
+        :param search_text: text to search
+        """
         writer = WriterWrapper(os.path.join(DATA_PATH, self.prefix), self.fieldnames)
-        for line in self.run():
+        for line in self.run(search_text=search_text):
             writer.write_row(line)
         writer.close()
 
 
 if __name__ == '__main__':
     crawler = VideoURLCrawler(
-        './config.ini',
-        'https://www.youtube.com/user/FIFATV/videos?live_view=503&sort=dd&view=2&shelf_id=0'
+        config_file_path='./config.ini',
+        target_url='https://www.youtube.com/user/FIFATV/videos',
+        number_of_scroll=50,
     )
-    crawler.export()
+    crawler.export(search_text='conference')

@@ -187,9 +187,16 @@ class ChatCrawler(BaseCrawler):
 
     def export_one(self, url_dict):
         # Run until its success.
+        attempt_counts = 0
         result_run_one = []
+
         while len(result_run_one) == 0:
             result_run_one = self.run_one(url_dict)
+            attempt_counts += 1
+
+            if attempt_counts >= 8:
+                cprint('{0} | Error, attempt_counts >= 8'.format(url_dict['title']), 'red')
+                break
 
         # Write
         writer = WriterWrapper(os.path.join(DATA_PATH, '_'.join([self.prefix, url_dict['title'], url_dict['time']])),
@@ -220,4 +227,7 @@ class ChatCrawler(BaseCrawler):
 
 if __name__ == '__main__':
     crawler = ChatCrawler('./config.ini')
-    crawler.export_with_multiprocess()
+    crawler.export_with_multiprocess(
+        processes=4,
+        resume_interval_in_min=1,
+    )
