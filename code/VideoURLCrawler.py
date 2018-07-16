@@ -25,9 +25,9 @@ class VideoURLCrawler(BaseCrawler):
         self.prefix = 'VideoURL'
         self.number_of_scroll = number_of_scroll
 
-    def run(self, search_text: str=None) -> list:
+    def run(self, search_text_list: list=None) -> list:
         """
-        :param search_text: text to search
+        :param search_text_list: text_list to search
         :return: list of videos that contain 'search_text'
         """
         self.driver = get_driver(self.config_file_path)
@@ -45,7 +45,7 @@ class VideoURLCrawler(BaseCrawler):
 
             title = anchor.text
             video_url: str = anchor.get_attribute('href')
-            if (not search_text) or (search_text in title.lower()):
+            if (not search_text_list) or [text for text in search_text_list if text in title.lower()]:
                 r.append({
                     'title': title,
                     'video_url': video_url,
@@ -57,12 +57,13 @@ class VideoURLCrawler(BaseCrawler):
 
         return r
 
-    def export(self, search_text: str=None):
+    def export(self, search_text_list: list=None):
         """
-        :param search_text: text to search
+        :param search_text_list: text to search
         """
+        result = self.run(search_text_list=search_text_list)
         writer = WriterWrapper(os.path.join(DATA_PATH, self.prefix), self.fieldnames)
-        for line in self.run(search_text=search_text):
+        for line in result:
             writer.write_row(line)
         writer.close()
 
@@ -73,4 +74,4 @@ if __name__ == '__main__':
         target_url='https://www.youtube.com/user/FIFATV/videos',
         number_of_scroll=50,
     )
-    crawler.export(search_text='conference')
+    crawler.export(search_text_list=['pc', 'conference', 'confernence'])
