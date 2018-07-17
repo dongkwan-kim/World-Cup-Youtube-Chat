@@ -5,6 +5,18 @@ from selenium import webdriver
 import configparser
 
 
+def country_to_code(path) -> list:
+    return [tuple(x.strip().split('\t')) for x in open(path, encoding='utf-8').readlines()]
+
+
+def get_files(path: str, search_text: str = None) -> list:
+    return [f for f in os.listdir(path) if (not search_text) or (search_text in f)]
+
+
+def get_files_with_dir_path(path: str, search_text: str = None) -> list:
+    return [os.path.join(path, f) for f in get_files(path, search_text)]
+
+
 def try_except_with_sleep(f):
     """
     :param f: function that use this decorator
@@ -17,6 +29,7 @@ def try_except_with_sleep(f):
             sleep(0.6)
         except Exception as e:
             print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), e, file=sys.stderr)
+
     return wrapper
 
 
