@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from utill import try_except_with_sleep, get_driver, iso2sec
+from utill.utill import try_except_with_sleep, get_driver, iso2sec
 from BaseCrawler import BaseCrawler
-from WriterWrapper import WriterWrapper
+from utill.WriterWrapper import WriterWrapper
 from time import sleep, time
 from multiprocessing import Process
 import csv

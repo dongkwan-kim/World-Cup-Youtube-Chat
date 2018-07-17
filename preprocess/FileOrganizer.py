@@ -1,5 +1,5 @@
-from utill import get_files, country_to_code
-from WriterWrapper import WriterWrapper
+from utill.utill import get_files, country_to_code
+from utill.WriterWrapper import WriterWrapper
 from typing import List
 from termcolor import cprint
 import re

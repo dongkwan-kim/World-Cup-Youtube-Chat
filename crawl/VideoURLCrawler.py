@@ -1,6 +1,6 @@
-from utill import get_driver
+from utill.utill import get_driver
 from BaseCrawler import BaseCrawler
-from WriterWrapper import WriterWrapper
+from utill.WriterWrapper import WriterWrapper
 from time import sleep
 import os
 
