@@ -1,8 +1,8 @@
-# youtube-chat-crawler
-Crawling youtube's live chat 
+# World-Cup-Youtube-Chat
+- Crawl 2018 FIFA World Cup Russia™'s live chat in Youtube.
 
 ## Note about Data 
-- country_to_code.txt is from [wikipedia](https://en.wikipedia.org/wiki/List_of_FIFA_country_codes)
+- [country_to_code.txt](./data/country_to_code.txt) is from [wikipedia](https://en.wikipedia.org/wiki/List_of_FIFA_country_codes)
 - There's no chat replay in
     - [FIFA World Cup™ 2018: Australia - Peru: Peru - Pre-Match Press Conference](https://www.youtube.com/watch?v=Z6g4uDoYKjE)
     - [FIFA World Cup™ 2018: ISL vs CRO : Iceland - Pre-Match Press Conference](https://www.youtube.com/watch?v=DpkT71KXKDE)
