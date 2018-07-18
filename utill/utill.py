@@ -29,11 +29,12 @@ def try_except(f):
     """
     def wrapper(*args, **kwargs):
         try:
-            f(*args, **kwargs)
+            return f(*args, **kwargs)
         except Exception as e:
             print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), e, file=sys.stderr)
 
     return wrapper
+
 
 def try_except_with_sleep(f):
     """
@@ -43,8 +44,9 @@ def try_except_with_sleep(f):
     def wrapper(*args, **kwargs):
         try:
             sleep(0.6)
-            f(*args, **kwargs)
+            result = f(*args, **kwargs)
             sleep(0.6)
+            return result
         except Exception as e:
             print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), e, file=sys.stderr)
 
