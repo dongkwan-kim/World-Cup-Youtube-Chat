@@ -1,0 +1,64 @@
+4:2	France	Croatia	2018.07.15
+2:0	Belgium	England	2018.07.14
+1:0	France	Belgium	2018.07.10
+2:1	Croatia	England	2018.07.11
+0:2	Uruguay	France	2018.07.06
+1:2	Brazil	Belgium	2018.07.06
+0:2	Sweden	England	2018.07.07
+2:2 (3:4)	Russia	Croatia	2018.07.07
+4:3	France	Argentina	2018.06.30
+2:1	Uruguay	Portugal	2018.06.30
+1:1 (3:4)	Spain	Russia	2018.07.01
+1:1 (3:2)	Croatia	Denmark	2018.07.01
+2:0	Brazil	Mexico	2018.07.02
+3:2	Belgium	Japan	2018.07.02
+1:0	Sweden	Switzerland	2018.07.03
+1:1 (3:4)	Colombia	England	2018.07.03
+5:0	Russia	Saudi Arabia	2018.06.14
+0:1	Egypt	Uruguay	2018.06.15
+3:1	Russia	Egypt	2018.06.19
+1:0	Uruguay	Saudi Arabia	2018.06.20
+3:0	Uruguay	Russia	2018.06.25
+2:1	Saudi Arabia	Egypt	2018.06.25
+0:1	Morocco	Iran	2018.06.15
+3:3	Portugal	Spain	2018.06.15
+1:0	Portugal	Morocco	2018.06.20
+0:1	Iran	Spain	2018.06.20
+1:1	Iran	Portugal	2018.06.25
+2:2	Spain	Morocco	2018.06.25
+2:1	France	Australia	2018.06.16
+0:1	Peru	Denmark	2018.06.16
+1:1	Denmark	Australia	2018.06.21
+1:0	France	Peru	2018.06.21
+0:0	Denmark	France	2018.06.26
+0:2	Australia	Peru	2018.06.26
+1:1	Argentina	Iceland	2018.06.16
+2:0	Croatia	Nigeria	2018.06.16
+0:3	Argentina	Croatia	2018.06.21
+2:0	Nigeria	Iceland	2018.06.22
+1:2	Nigeria	Argentina	2018.06.26
+1:2	Iceland	Croatia	2018.06.26
+0:1	Costa Rica	Serbia	2018.06.17
+1:1	Brazil	Switzerland	2018.06.17
+2:0	Brazil	Costa Rica	2018.06.22
+1:2	Serbia	Switzerland	2018.06.22
+0:2	Serbia	Brazil	2018.06.27
+2:2	Switzerland	Costa Rica	2018.06.27
+0:1	Germany	Mexico	2018.06.17
+1:0	Sweden	South Korea	2018.06.18
+1:2	South Korea	Mexico	2018.06.23
+2:1	Germany	Sweden	2018.06.23
+2:0	South Korea	Germany	2018.06.27
+0:3	Mexico	Sweden	2018.06.27
+3:0	Belgium	Panama	2018.06.18
+1:2	Tunisia	England	2018.06.18
+5:2	Belgium	Tunisia	2018.06.23
+6:1	England	Panama	2018.06.24
+0:1	England	Belgium	2018.06.28
+1:2	Panama	Tunisia	2018.06.28
+1:2	Colombia	Japan	2018.06.19
+1:2	Poland	Senegal	2018.06.19
+2:2	Japan	Senegal	2018.06.24
+0:3	Poland	Colombia	2018.06.24
+0:1	Japan	Poland	2018.06.28
+0:1	Senegal	Colombia	2018.06.28
