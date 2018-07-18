@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from path import DATA_PATH, CHAT_PATH
 from utill.utill import try_except_with_sleep, get_driver, iso2sec
 from BaseCrawler import BaseCrawler
 from utill.WriterWrapper import WriterWrapper
@@ -14,9 +15,6 @@ try:
     from orderedset import OrderedSet
 except:
     pass
-
-
-DATA_PATH = '../data'
 
 
 class ChatCrawler(BaseCrawler):
@@ -199,7 +197,7 @@ class ChatCrawler(BaseCrawler):
                 break
 
         # Write
-        writer = WriterWrapper(os.path.join(DATA_PATH, '_'.join([self.prefix, url_dict['title'], url_dict['time']])),
+        writer = WriterWrapper(os.path.join(CHAT_PATH, '_'.join([self.prefix, url_dict['title'], url_dict['time']])),
                                self.fieldnames)
         for line in result_run_one:
             writer.write_row(line)

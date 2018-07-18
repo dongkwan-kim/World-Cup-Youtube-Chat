@@ -1,12 +1,10 @@
+from path import DATA_PATH, CHAT_PATH
 from utill.utill import get_files, country_to_code, get_match_result
 from utill.WriterWrapper import WriterWrapper
 from typing import List
 from termcolor import cprint
 import re
 import os
-
-
-DATA_PATH = '../data'
 
 
 FILE_REGEX = [
@@ -123,7 +121,7 @@ class FileOrganizer:
 
 if __name__ == '__main__':
 
-    chat_files = get_files(DATA_PATH, 'Chat')
+    chat_files = get_files(CHAT_PATH, 'Chat')
     to_code = country_to_code(os.path.join(DATA_PATH, 'country_to_code.txt'))
     match_result = get_match_result(os.path.join(DATA_PATH, 'match_result.txt'))
 

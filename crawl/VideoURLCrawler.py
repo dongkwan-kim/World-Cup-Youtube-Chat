@@ -1,11 +1,9 @@
+from path import DATA_PATH
 from utill.utill import get_driver
 from BaseCrawler import BaseCrawler
 from utill.WriterWrapper import WriterWrapper
 from time import sleep
 import os
-
-
-DATA_PATH = '../data'
 
 
 class VideoURLCrawler(BaseCrawler):
