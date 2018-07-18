@@ -6,10 +6,7 @@ from typing import List
 import configparser
 
 
-def get_match_result(path) -> List[str]:
-    # e.g.
-    # '4:2	France	Croatia	2018.07.15'
-    # '2:2 (3:4)	Russia	Croatia	2018.07.07'
+def get_readlines(path) -> List[str]:
     return [line for line in open(path, 'r', encoding='utf-8').readlines()]
 
 

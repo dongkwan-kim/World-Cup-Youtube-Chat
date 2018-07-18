@@ -1,5 +1,5 @@
 from path import DATA_PATH, CHAT_PATH
-from utill.utill import get_files, country_to_code, get_match_result
+from utill.utill import get_files, country_to_code, get_readlines
 from utill.WriterWrapper import WriterWrapper
 from typing import List
 from termcolor import cprint
@@ -21,6 +21,7 @@ class FileOrganizer:
         self.file_names = file_names
         self.preprocessed_file_names = []
         self.match_result = []
+        self.ranking_points = []
         self.prefix = 'Description'
         self.fieldnames = []
 
@@ -102,15 +103,34 @@ class FileOrganizer:
         self.match_result = match_result_return
         return match_result_return
 
+    def add_ranking_points(self, rules: List[tuple], ranking_points: List[str]):
+
+        self.fieldnames = ['ranking_point_diff'] + self.fieldnames
+
+        ranking_points_return = []
+        ranking_points = [x.strip().split('\t') for x in self.preprocess_by_replace(rules, ranking_points)]
+
+        for rank, country, points in ranking_points:
+            ranking_points_return.append({
+                'rank': int(rank),
+                'country': country,
+                'points': int(float(points)),
+            })
+
+        self.ranking_points = ranking_points_return
+        return ranking_points_return
+
     def export_organized(self, rules: List[tuple], regex_list: List[str]):
 
         organized = self.organize_by_regex(rules, regex_list)
         match_to_winner = {(dct['country_1'], dct['country_2']): dct['winner'] for dct in self.match_result}
+        country_to_points = {dct['country']: dct['points'] for dct in self.ranking_points}
 
         result = []
         for obj in organized:
             match = (obj['country_1'], obj['country_2'])
             obj['winner'] = match_to_winner[match]
+            obj['ranking_point_diff'] = country_to_points[match[0]] - country_to_points[match[1]]
             result.append(obj)
 
         writer = WriterWrapper(os.path.join(DATA_PATH, self.prefix), self.fieldnames)
@@ -123,9 +143,11 @@ if __name__ == '__main__':
 
     chat_files = get_files(CHAT_PATH, 'Chat')
     to_code = country_to_code(os.path.join(DATA_PATH, 'country_to_code.txt'))
-    match_result = get_match_result(os.path.join(DATA_PATH, 'match_result.txt'))
+    match_result = get_readlines(os.path.join(DATA_PATH, 'match_result.txt'))
+    ranking_points = get_readlines(os.path.join(DATA_PATH, 'ranking.txt'))
 
     file_organizer = FileOrganizer(chat_files)
     file_organizer.preprocess_by_replace(to_code)
     file_organizer.add_match_result(to_code, match_result)
+    file_organizer.add_ranking_points(to_code, ranking_points)
     file_organizer.export_organized(to_code, FILE_REGEX)
