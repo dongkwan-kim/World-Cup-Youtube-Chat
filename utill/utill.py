@@ -22,6 +22,19 @@ def get_files_with_dir_path(path: str, search_text: str = None) -> list:
     return [os.path.join(path, f) for f in get_files(path, search_text)]
 
 
+def try_except(f):
+    """
+    :param f: function that use this decorator
+    :return:
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            f(*args, **kwargs)
+        except Exception as e:
+            print('P{0} | Error: {1}'.format(os.getpid(), f.__name__), e, file=sys.stderr)
+
+    return wrapper
+
 def try_except_with_sleep(f):
     """
     :param f: function that use this decorator
