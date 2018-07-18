@@ -4,6 +4,7 @@
 ## Note about Data 
 - [country_to_code.txt](./data/country_to_code.txt) is from [wikipedia](https://en.wikipedia.org/wiki/List_of_FIFA_country_codes)
 - [match_result.txt](./data/match_result.txt) is from [FIFA Homepage](https://www.fifa.com/worldcup/matches/)
+- [ranking.txt](./data/ranking.txt) is from [FIFA Homepage](https://www.fifa.com/fifa-world-ranking/ranking-table/men/)
 - There's no chat replay in
     - [FIFA World Cup™ 2018: Australia - Peru: Peru - Pre-Match Press Conference](https://www.youtube.com/watch?v=Z6g4uDoYKjE)
     - [FIFA World Cup™ 2018: ISL vs CRO : Iceland - Pre-Match Press Conference](https://www.youtube.com/watch?v=DpkT71KXKDE)
