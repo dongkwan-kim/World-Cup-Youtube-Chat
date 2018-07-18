@@ -1,4 +1,4 @@
-from path import DATA_PATH
+from custom_path import DATA_PATH
 from DataLoader import MultiChatDataLoader
 from utill.utill import get_files_with_dir_path
 from typing import Callable

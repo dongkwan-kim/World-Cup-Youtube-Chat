@@ -1,4 +1,4 @@
-from path import DATA_PATH, CHAT_PATH
+from custom_path import DATA_PATH, CHAT_PATH
 from utill.utill import get_files_with_dir_path, try_except
 from typing import List, Dict, Callable
 from collections import OrderedDict

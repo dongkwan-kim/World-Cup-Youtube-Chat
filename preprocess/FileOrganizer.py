@@ -1,4 +1,4 @@
-from path import DATA_PATH, CHAT_PATH
+from custom_path import DATA_PATH, CHAT_PATH
 from utill.utill import get_files, country_to_code, get_readlines
 from utill.WriterWrapper import WriterWrapper
 from typing import List

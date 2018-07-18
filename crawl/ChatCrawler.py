@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from path import DATA_PATH, CHAT_PATH
+from custom_path import DATA_PATH, CHAT_PATH
 from utill.utill import try_except_with_sleep, get_driver, iso2sec
 from BaseCrawler import BaseCrawler
 from utill.WriterWrapper import WriterWrapper
