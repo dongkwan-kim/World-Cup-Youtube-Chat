@@ -2,8 +2,20 @@ import os
 import sys
 from time import sleep
 from selenium import webdriver
-from typing import List
+from typing import List, Callable
 import configparser
+
+
+def have_enough_words(length: int) -> Callable[[str], bool]:
+    """
+    :param length: int
+    :return: boolean function that return '#words >= length'
+    """
+
+    def wrapper(s: str) -> bool:
+        return len(s.split()) >= length
+
+    return wrapper
 
 
 def get_readlines(path) -> List[str]:
