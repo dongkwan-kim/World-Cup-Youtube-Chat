@@ -1,0 +1,32 @@
+Russia	Russian	Abaza	Adyghe	Aghul	Altai	Azerbaijani	Bashkir	Buryat	Chechen	Chuvash	Crimean	Tartar	Dargin	Erzya	Ingush	Kabardian	Kalmyk	Karachay-Balkar	Khakas	Komi-Zyrian	Kumyk	Lak	Lezgian	Mari	Moksha	Nogai	Ossetic	Rutul	Sakha	Tabasaran	Tatar	Tati	Tsakhur	Tuvin	Udmurt	Ukrainian
+Portugal	Portuguese
+France	French
+Argentina	Spanish	Guaraní	Kom	Moquoit	Wichi
+Brazil	Portuguese	German	East Pomeranian	Hunsrückisch	Talian	Nheengatu	Baniwa	Tucano	Guaraní
+Germany	German	Danish	Lower Sorbian	North Frisian	Saterland Frisian	Upper Sorbian	German Sign Language	Low German
+Belgium	Dutch	French	German
+Poland	Polish
+Saudi Arabia	Arabic
+Spain	Spanish	Catalan	Galician	Occitan	Basque
+Australia	English
+Iceland	Icelandic	Icelandic Sign Language
+Switzerland	German	French	Italian	Romansh
+Mexico	Spanish
+Panama	Spanish
+Senegal	French	Jola-Fogny	Mandinka	Pulaar	Serer	Soninke	Wolof
+Egypt	Arabic
+Morocco	Arabic	Berber
+Peru	Spanish	Aymara	Quechua
+Croatia	Croatian	Serbian	Hungarian	Czech	Slovak	Pannonian Rusyn	Istro-Romanian
+Costa Rica	Spanish
+Sweden	Swedish
+Tunisia	Arabic
+Colombia	Spanish
+Uruguay	Spanish
+Iran	Persian
+Denmark	Danish	Faroese	Kalaallisut
+Nigeria	English	Hausa	Yoruba	Igbo
+Serbia	Serbian
+South Korea	Korean
+England	English
+Japan	Japanese
