@@ -4,6 +4,8 @@ from utill.utill import get_files_with_dir_path
 from typing import Callable
 from collections import OrderedDict
 from utill.utill import try_except, have_enough_words, is_values_of_key_matched
+import os
+import pickle
 
 # https://github.com/Mimino666/langdetect
 import langdetect as ld
@@ -29,6 +31,25 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
     def __init__(self, path: str, loader_nums: int = None,
                  label_condition_func: Callable = None, label_condition_args: tuple = tuple(),
                  words_enough: tuple = (1, 3), lang_func: Callable = ld.detect):
+        """
+        :param path: path of description file
+        :param loader_nums: the number of loaders
+        :param label_condition_func: def func(line_dict, *args): ... like is_values_of_key_matched
+        :param label_condition_args: e.g. ({'winner': 'DRAW', 'main': 'ISL'},)
+        :param words_enough: (words for author_name, words for message)
+        :param lang_func: return str
+        """
+
+        self.info = '-'.join([
+            str(loader_nums),
+            str(label_condition_func.__name__ if label_condition_func else None),
+            str(label_condition_args if label_condition_args else None),
+            str(words_enough),
+            str(lang_func.__name__),
+        ])
+
+        if self.load():
+            return
 
         super().__init__(
             path=path,
@@ -44,20 +65,48 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
         self.add_feature('lang_message', detect_func,
                          args=(have_enough_words(words_enough[1]), lang_func, 'message'))
 
+    def get_file_name_to_dump_and_load(self):
+        return '{}-{}.pkl'.format(self.__class__.__name__, self.info)
+
+    def dump(self):
+        dump_file_name = self.get_file_name_to_dump_and_load()
+
+        # If dump_file_name exists, just return.
+        if dump_file_name in os.listdir(DATA_PATH):
+            print('Dump Fail: {} already exists.'.format(dump_file_name))
+            return
+
+        with open(os.path.join(DATA_PATH, dump_file_name), 'wb') as f:
+            pickle.dump(self, f)
+        print('Dumped: {}'.format(dump_file_name))
+
+    def load(self):
+        load_file_name = self.get_file_name_to_dump_and_load()
+        try:
+            with open(os.path.join(DATA_PATH, load_file_name), 'rb') as f:
+                loaded: MultiLangChatDataLoader = pickle.load(f)
+                self.chat_data_loader_list = loaded.chat_data_loader_list
+            print('Loaded: {}'.format(load_file_name))
+            return True
+        except Exception as e:
+            print('Load Fail: {0}.\n'.format(load_file_name), str(e))
+            return False
+
 
 if __name__ == '__main__':
 
     description_files = get_files_with_dir_path(DATA_PATH, 'Description')
     multi_lang_chat_data_loader = MultiLangChatDataLoader(
         path=description_files[0],
-        label_condition_func=is_values_of_key_matched,
-        label_condition_args=({'winner': 'DRAW', 'main': 'ISL'},),
+        label_condition_func=None,
+        label_condition_args=tuple(),
         words_enough=(1, 3),
         lang_func=li_classify_str,
     )
 
-    for lang_chat_data_loader in multi_lang_chat_data_loader:
+    for lang_chat_data_loader in multi_lang_chat_data_loader[{}]:
         for line in lang_chat_data_loader.lines:
-            line.pop('img')
-            print(line)
+            print({k: v for k, v in line.items() if k != 'img'})
         print(lang_chat_data_loader.label_dict)
+
+    multi_lang_chat_data_loader.dump()
