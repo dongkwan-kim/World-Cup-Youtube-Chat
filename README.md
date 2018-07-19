@@ -3,10 +3,15 @@
 
 ## Note about Data 
 - [country_to_code.txt](./data/country_to_code.txt) is from [wikipedia](https://en.wikipedia.org/wiki/List_of_FIFA_country_codes)
+    - country | code
 - [match_result.txt](./data/match_result.txt) is from [FIFA Homepage](https://www.fifa.com/worldcup/matches/)
+    - result | country_1 | country_2 | date
 - [ranking.txt](./data/ranking.txt) is from [FIFA Homepage](https://www.fifa.com/fifa-world-ranking/ranking-table/men/)
+    - rank | code | points
 - [iso639-1.txt](./data/iso639-1.txt) is from [wikipedia](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+    - iso_code | lang
 - [lang_by_country.txt](./data/lang_by_country.txt) is from [wikipedia](https://en.wikipedia.org/wiki/List_of_official_languages_by_country_and_territory)
+    - country | *lang
 - There's no chat replay in
     - [FIFA World Cup™ 2018: Australia - Peru: Peru - Pre-Match Press Conference](https://www.youtube.com/watch?v=Z6g4uDoYKjE)
     - [FIFA World Cup™ 2018: ISL vs CRO : Iceland - Pre-Match Press Conference](https://www.youtube.com/watch?v=DpkT71KXKDE)
