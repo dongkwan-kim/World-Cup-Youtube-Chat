@@ -2,7 +2,7 @@ import os
 import sys
 from time import sleep
 from selenium import webdriver
-from typing import List, Callable
+from typing import List, Callable, Tuple
 import configparser
 
 
@@ -36,8 +36,8 @@ def get_readlines(path) -> List[str]:
     return [line for line in open(path, 'r', encoding='utf-8').readlines()]
 
 
-def country_to_code(path) -> list:
-    return [tuple(x.strip().split('\t')) for x in open(path, encoding='utf-8').readlines()]
+def get_tsv(path) -> List[Tuple]:
+    return [tuple(x.strip().split('\t')) for x in get_readlines(path)]
 
 
 def get_files(path: str, search_text: str = None) -> list:

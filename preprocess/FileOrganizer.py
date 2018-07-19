@@ -1,5 +1,5 @@
 from custom_path import DATA_PATH, CHAT_PATH
-from utill.utill import get_files, country_to_code, get_readlines
+from utill.utill import get_files, get_tsv, get_readlines
 from utill.WriterWrapper import WriterWrapper
 from typing import List
 from termcolor import cprint
@@ -142,12 +142,12 @@ class FileOrganizer:
 if __name__ == '__main__':
 
     chat_files = get_files(CHAT_PATH, 'Chat')
-    to_code = country_to_code(os.path.join(DATA_PATH, 'country_to_code.txt'))
+    country_to_code = get_tsv(os.path.join(DATA_PATH, 'country_to_code.txt'))
     match_result = get_readlines(os.path.join(DATA_PATH, 'match_result.txt'))
     ranking_points = get_readlines(os.path.join(DATA_PATH, 'ranking.txt'))
 
     file_organizer = FileOrganizer(chat_files)
-    file_organizer.preprocess_by_replace(to_code)
-    file_organizer.add_match_result(to_code, match_result)
-    file_organizer.add_ranking_points(to_code, ranking_points)
-    file_organizer.export_organized(to_code, FILE_REGEX)
+    file_organizer.preprocess_by_replace(country_to_code)
+    file_organizer.add_match_result(country_to_code, match_result)
+    file_organizer.add_ranking_points(country_to_code, ranking_points)
+    file_organizer.export_organized(country_to_code, FILE_REGEX)
