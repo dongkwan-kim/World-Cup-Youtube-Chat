@@ -77,10 +77,13 @@ class MultiChatDataLoader:
         """
         self.chat_data_loader_list: List[ChatDataLoader] = []
 
-        conditioned = [line_dict for line_dict in csv.DictReader(open(path, 'r', encoding='utf-8'))
-                       if label_condition_func(line_dict, *label_condition_args)]
+        if label_condition_func:
+            line_dict_list = [line_dict for line_dict in csv.DictReader(open(path, 'r', encoding='utf-8'))
+                              if label_condition_func(line_dict, *label_condition_args)]
+        else:
+            line_dict_list = list(csv.DictReader(open(path, 'r', encoding='utf-8')))
 
-        for i, line_dict in enumerate(conditioned):
+        for i, line_dict in enumerate(line_dict_list):
 
             if loader_nums and i >= loader_nums:
                 break
