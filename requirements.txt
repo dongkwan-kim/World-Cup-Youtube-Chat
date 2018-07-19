@@ -1,4 +1,6 @@
 langdetect==1.0.7
+langid==1.1.6
+numpy==1.14.5
 orderedset==2.0.1
 selenium==3.13.0
 six==1.11.0
