@@ -6,6 +6,20 @@ from typing import List, Callable
 import configparser
 
 
+def is_values_of_key_matched(target_dict: dict, key_dict: dict) -> bool:
+    """
+    :param target_dict: e.g. 1) {'winner': 'KOR', ...} 2) {'winner': 'GER', ...}
+    :param key_dict: e.g. {'winner': 'KOR'}
+    :return: e.g. 1) True 2) False
+    """
+
+    for key, val in key_dict.items():
+        if target_dict[key] != val:
+            return False
+
+    return True
+
+
 def have_enough_words(length: int) -> Callable[[str], bool]:
     """
     :param length: int

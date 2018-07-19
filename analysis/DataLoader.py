@@ -43,7 +43,7 @@ class ChatDataLoader:
     def __str__(self):
         return ' '.join([self.__class__.__name__, str(self.label_dict)])
 
-    def add_feature(self, feature_name: str, feature_func: Callable, args: tuple=tuple()):
+    def add_feature(self, feature_name: str, feature_func: Callable, args: tuple = tuple()):
         """
         :param feature_name: str to add
         :param feature_func: def func(line: OrderedDict, args): ...
@@ -67,13 +67,20 @@ class ChatDataLoader:
 
 class MultiChatDataLoader:
 
-    def __init__(self, path: str, loader_nums: int=None):
+    def __init__(self, path: str, loader_nums: int = None,
+                 label_condition_func: Callable = None, label_condition_args: tuple = tuple()):
         """
         :param path: path of description file
         :param loader_nums: the number of loaders
+        :param label_condition_func: def func(line_dict, *args): ...
+        :param label_condition_args: tuple
         """
         self.chat_data_loader_list: List[ChatDataLoader] = []
-        for i, line_dict in enumerate(csv.DictReader(open(path, 'r', encoding='utf-8'))):
+
+        conditioned = [line_dict for line_dict in csv.DictReader(open(path, 'r', encoding='utf-8'))
+                       if label_condition_func(line_dict, *label_condition_args)]
+
+        for i, line_dict in enumerate(conditioned):
 
             if loader_nums and i >= loader_nums:
                 break
@@ -83,7 +90,7 @@ class MultiChatDataLoader:
                 label_dict=dict(line_dict),
             ))
 
-    def add_feature(self, feature_name: str, feature_func: Callable, args: tuple=tuple()):
+    def add_feature(self, feature_name: str, feature_func: Callable, args: tuple = tuple()):
         """
         :param feature_name: str to add
         :param feature_func: def func(line: OrderedDict, args): ...
@@ -96,8 +103,26 @@ class MultiChatDataLoader:
     def __len__(self):
         return len(self.chat_data_loader_list)
 
-    def __getitem__(self, idx):
-        return self.chat_data_loader_list[idx]
+    def __getitem__(self, target_label_dict: dict) -> List[ChatDataLoader]:
+        r = []
+        for _chat_data_loader in self.chat_data_loader_list:
+            for label_key, label_value in target_label_dict.items():
+                if _chat_data_loader.get_label(label_key) != label_value:
+                    break
+            else:
+                r.append(_chat_data_loader)
+        return r
+
+    def __iter__(self):
+        self.index = 0
+        return self
+
+    def __next__(self):
+        if self.index >= len(self):
+            raise StopIteration
+        n = self.chat_data_loader_list[self.index]
+        self.index += 1
+        return n
 
 
 if __name__ == '__main__':
