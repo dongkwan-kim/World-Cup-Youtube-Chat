@@ -29,7 +29,11 @@ def have_enough_words(length: int) -> Callable[[str], bool]:
     def wrapper(s: str) -> bool:
         return len(s.split()) >= length
 
-    return wrapper
+    # set the __name__ of wrapper
+    w = wrapper
+    w.__name__ = 'have_enough_words_{}'.format(str(length))
+
+    return w
 
 
 def get_readlines(path) -> List[str]:

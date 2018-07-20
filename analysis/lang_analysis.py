@@ -1,7 +1,7 @@
 from custom_path import DATA_PATH
 from DataLoader import MultiChatDataLoader
 from utill.utill import get_files_with_dir_path
-from typing import Callable
+from typing import Callable, Tuple
 from collections import OrderedDict
 from utill.utill import try_except, have_enough_words, is_values_of_key_matched
 import os
@@ -30,13 +30,14 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
 
     def __init__(self, path: str, loader_nums: int = None,
                  label_condition_func: Callable = None, label_condition_args: tuple = tuple(),
-                 words_enough: tuple = (1, 3), lang_func: Callable = ld.detect):
+                 criteria_funcs: Tuple[Callable, Callable] = (None, None),
+                 lang_func: Callable = ld.detect):
         """
         :param path: path of description file
         :param loader_nums: the number of loaders
         :param label_condition_func: def func(line_dict, *args): ... like is_values_of_key_matched
         :param label_condition_args: e.g. ({'winner': 'DRAW', 'main': 'ISL'},)
-        :param words_enough: (words for author_name, words for message)
+        :param criteria_funcs: tuple of criteria_func for feature addition
         :param lang_func: return str
         """
 
@@ -44,7 +45,7 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
             str(loader_nums),
             str(label_condition_func.__name__ if label_condition_func else None),
             str(label_condition_args if label_condition_args else None),
-            str(words_enough),
+            str(tuple((cf.__name__ if cf else None) for cf in criteria_funcs)),
             str(lang_func.__name__),
         ])
 
@@ -60,10 +61,11 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
 
         # Add detected language.
         # args = (criteria_func: Callable, lang_func: Callable, line_key: str)
+        criteria_func_list = [(cf if cf else lambda _: True) for cf in criteria_funcs]
         self.add_feature('lang_author_name', detect_func,
-                         args=(have_enough_words(words_enough[0]), lang_func, 'author_name'))
+                         args=(criteria_func_list.pop(0), lang_func, 'author_name'))
         self.add_feature('lang_message', detect_func,
-                         args=(have_enough_words(words_enough[1]), lang_func, 'message'))
+                         args=(criteria_func_list.pop(0), lang_func, 'message'))
 
     def get_file_name_to_dump_and_load(self):
         return '{}-{}.pkl'.format(self.__class__.__name__, self.info)
@@ -100,7 +102,7 @@ if __name__ == '__main__':
         path=description_files[0],
         label_condition_func=None,
         label_condition_args=tuple(),
-        words_enough=(1, 3),
+        criteria_funcs=(have_enough_words(1), have_enough_words(1)),
         lang_func=li_classify_str,
     )
 
