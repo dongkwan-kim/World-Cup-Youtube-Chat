@@ -1,6 +1,6 @@
 from custom_path import DATA_PATH, CHAT_PATH
-from utill.utill import get_files, get_tsv, get_readlines
-from utill.WriterWrapper import WriterWrapper
+from utill import get_files, get_tsv, get_readlines
+from WriterWrapper import WriterWrapper
 from typing import List
 from termcolor import cprint
 import re

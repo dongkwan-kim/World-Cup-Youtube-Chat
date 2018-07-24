@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from custom_path import DATA_PATH, CHAT_PATH
-from utill.utill import try_except_with_sleep, get_driver, iso2sec
+from utill import try_except_with_sleep, get_driver, iso2sec
 from BaseCrawler import BaseCrawler
-from utill.WriterWrapper import WriterWrapper
+from WriterWrapper import WriterWrapper
 from time import sleep, time
 from multiprocessing import Process
 import csv
