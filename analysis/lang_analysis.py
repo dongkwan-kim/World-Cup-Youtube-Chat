@@ -4,6 +4,7 @@ from utill.utill import get_files_with_dir_path
 from typing import Callable, Tuple
 from collections import OrderedDict
 from utill.utill import try_except, have_enough_words, is_values_of_key_matched
+from termcolor import cprint, colored
 import os
 import pickle
 
@@ -75,12 +76,12 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
 
         # If dump_file_name exists, just return.
         if dump_file_name in os.listdir(DATA_PATH):
-            print('Dump Fail: {} already exists.'.format(dump_file_name))
+            cprint('Dump Fail: {} already exists.'.format(dump_file_name), 'red')
             return
 
         with open(os.path.join(DATA_PATH, dump_file_name), 'wb') as f:
             pickle.dump(self, f)
-        print('Dumped: {}'.format(dump_file_name))
+        cprint('Dumped: {}'.format(dump_file_name), 'blue')
 
     def load(self):
         load_file_name = self.get_file_name_to_dump_and_load()
@@ -88,10 +89,10 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
             with open(os.path.join(DATA_PATH, load_file_name), 'rb') as f:
                 loaded: MultiLangChatDataLoader = pickle.load(f)
                 self.chat_data_loader_list = loaded.chat_data_loader_list
-            print('Loaded: {}'.format(load_file_name))
+            cprint('Loaded: {}'.format(load_file_name), 'green')
             return True
         except Exception as e:
-            print('Load Fail: {0}.\n'.format(load_file_name), str(e))
+            print(colored('Load Fail: {0}.\n'.format(load_file_name), 'red'), str(e))
             return False
 
 
