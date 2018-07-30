@@ -55,6 +55,7 @@ class ChatDataLoader:
             line[feature_name] = feature_func(line, *args)
             new_lines.append(line)
         self.lines = new_lines
+        print('Add feature: {}, {}'.format(feature_name, str(self.label_dict)))
 
     @try_except
     def get_label(self, key):

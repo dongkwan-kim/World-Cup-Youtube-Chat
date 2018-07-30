@@ -4,6 +4,7 @@ from utill import get_files_with_dir_path, try_except, have_enough_words
 from typing import Callable, Tuple
 from collections import OrderedDict
 from termcolor import cprint, colored
+from collections import Counter
 import os
 import pickle
 
@@ -94,6 +95,29 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
             print(colored('Load Fail: {0}.\n'.format(load_file_name), 'red'), str(e))
             return False
 
+    def is_dump_possible(self):
+        return self.get_file_name_to_dump_and_load() not in os.listdir(DATA_PATH)
+
+    def get_stats(self):
+        author_lang_list = []
+        message_lang_list = []
+        for data_loader in self:
+            author_lang_list += [line_dict['lang_author_name'] for line_dict in data_loader]
+            message_lang_list += [line_dict['lang_message'] for line_dict in data_loader]
+        return {
+            'author_lang': Counter(author_lang_list),
+            'message_lang': Counter(message_lang_list),
+        }
+
+    def print_stats(self):
+        stats = self.get_stats()
+        for name, counter in stats.items():
+            print(name)
+            for k, v in sorted(counter.items(), key=lambda x: -int(x[1])):
+                k = k if k else 'None'
+                print('{}\t{}'.format(k, v))
+            print()
+
 
 if __name__ == '__main__':
 
@@ -103,12 +127,16 @@ if __name__ == '__main__':
         label_condition_func=None,
         label_condition_args=tuple(),
         criteria_funcs=(have_enough_words(1), have_enough_words(1)),
-        lang_func=li_classify_str,
+        lang_func=ld.detect,
     )
 
     for lang_chat_data_loader in multi_lang_chat_data_loader[{}]:
         for line in lang_chat_data_loader.lines:
             print({k: v for k, v in line.items() if k != 'img'})
         print(lang_chat_data_loader.label_dict)
+        break
 
-    multi_lang_chat_data_loader.dump()
+    multi_lang_chat_data_loader.print_stats()
+
+    if multi_lang_chat_data_loader.is_dump_possible():
+        multi_lang_chat_data_loader.dump()
