@@ -1,9 +1,27 @@
 import os
 import sys
-from time import sleep
+import re
+from time import sleep, time
 from selenium import webdriver
 from typing import List, Callable, Tuple
 import configparser
+
+
+def clean_split(s: str, delimiter='\s+'):
+    s = re.sub('[~`!@#$%^&*(),.<>?\-+_=|/\[\]{}]+', ' ', s)
+    return re.split(delimiter, s.strip())
+
+
+def introduce_function(f: Callable):
+
+    def wrapper(*args, **kwargs):
+        start_time = time()
+        print('Start: {}'.format(f.__name__))
+        result = f(*args, **kwargs)
+        print('End: {}, {}s consumed'.format(f.__name__, time() - start_time))
+        return result
+
+    return wrapper
 
 
 def is_values_of_key_matched(target_dict: dict, key_dict: dict) -> bool:
@@ -113,3 +131,7 @@ def iso2sec(iso: str) -> int:
         raise Exception('len_arr > 3, arr: {}'.format(arr))
 
     return int(arr[0]) * 60 * 60 + int(arr[1]) * 60 + int(arr[2])
+
+
+if __name__ == '__main__':
+    print(clean_split('123! [wow,]+ {yes} I (am), a - boy.'))

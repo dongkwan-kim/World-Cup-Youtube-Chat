@@ -1,10 +1,11 @@
 from custom_path import DATA_PATH
 from DataLoader import MultiChatDataLoader
 from utill import get_files_with_dir_path, try_except, have_enough_words
+from WriterWrapper import WriterWrapper
 from typing import Callable, Tuple
 from collections import OrderedDict
 from termcolor import cprint, colored
-from collections import Counter
+from collections import Counter, defaultdict
 import os
 import pickle
 
@@ -99,24 +100,32 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
         return self.get_file_name_to_dump_and_load() not in os.listdir(DATA_PATH)
 
     def get_stats(self):
-        author_lang_list = []
-        message_lang_list = []
+        author_lang_dict = defaultdict(list)
+        message_lang_dict = defaultdict(list)
         for data_loader in self:
-            author_lang_list += [line_dict['lang_author_name'] for line_dict in data_loader]
-            message_lang_list += [line_dict['lang_message'] for line_dict in data_loader]
+            match_tuple = (data_loader.get_label('country_1'), data_loader.get_label('country_2'))
+            author_lang_dict[match_tuple] += [line_dict['lang_author_name'] for line_dict in data_loader]
+            message_lang_dict[match_tuple] += [line_dict['lang_message'] for line_dict in data_loader]
+
         return {
-            'author_lang': Counter(author_lang_list),
-            'message_lang': Counter(message_lang_list),
+            'author_lang': {k: Counter([(vv if vv else None) for vv in v]) for k, v in author_lang_dict.items()},
+            'message_lang': {k: Counter([(vv if vv else None) for vv in v]) for k, v in message_lang_dict.items()},
         }
 
-    def print_stats(self):
+    def export_stats(self):
         stats = self.get_stats()
-        for name, counter in stats.items():
-            print(name)
-            for k, v in sorted(counter.items(), key=lambda x: -int(x[1])):
-                k = k if k else 'None'
-                print('{}\t{}'.format(k, v))
-            print()
+        for name, lang_dict in stats.items():
+            lines, fieldnames = [], []
+            for match, counter in lang_dict.items():
+                lines.append({'match': match, **dict(counter)})
+                fieldnames += list(counter.keys())
+            fieldnames = ['match'] + [lang for lang, _ in sorted(list(Counter(fieldnames).items()), key=lambda x: -x[1])]
+
+            writer = WriterWrapper(os.path.join(DATA_PATH, 'lang_dist_{}'.format(name)), fieldnames)
+            for line_dict in lines:
+                print(line_dict)
+                writer.write_row(line_dict)
+            writer.close()
 
 
 if __name__ == '__main__':
@@ -134,9 +143,8 @@ if __name__ == '__main__':
         for line in lang_chat_data_loader.lines:
             print({k: v for k, v in line.items() if k != 'img'})
         print(lang_chat_data_loader.label_dict)
-        break
 
-    multi_lang_chat_data_loader.print_stats()
+    multi_lang_chat_data_loader.export_stats()
 
     if multi_lang_chat_data_loader.is_dump_possible():
         multi_lang_chat_data_loader.dump()
