@@ -4,6 +4,7 @@ from custom_path import DATA_PATH
 from lang import MultiLangChatDataLoader, li_classify_str
 from utill import get_files_with_dir_path, have_enough_words
 from WriterWrapper import WriterWrapper
+from pprint import pprint
 
 # https://github.com/Mimino666/langdetect
 import langdetect as ld
@@ -23,14 +24,21 @@ class YoutubeUser:
         return (other.name == self.name) and (other.get_img_hash() == self.get_img_hash())
 
     def __hash__(self):
-        # self.get_img_hash()
         return (self.name, self.get_img_hash()).__hash__()
 
     def __repr__(self):
         return '_'.join([self.name, self.get_img_hash()])
 
+    def pseudo_eq(self, o):
+        if isinstance(o, str):
+            return self.name == o or self.img == o or self.get_img_hash() == o
+        elif isinstance(o, YoutubeUser):
+            return self == o
+        else:
+            raise TypeError
 
-def get_user_to_match_to_lines(_multi_lang_chat_data_loader) -> Dict[YoutubeUser, Dict[tuple, list]] :
+
+def get_user_to_match_to_lines(_multi_lang_chat_data_loader) -> Dict[YoutubeUser, Dict[tuple, list]]:
     _user_to_match_to_lines: Dict[YoutubeUser, Dict[tuple, list]] = defaultdict(lambda: defaultdict(list))
     for i, data_loader in enumerate(_multi_lang_chat_data_loader):
         match_tuple = (
@@ -59,15 +67,25 @@ def get_user_to_lang_to_count(_lang_list, _sorted_user_to_match_to_lines):
 def export_user_stats(_multi_lang_chat_data_loader, _sorted_user_to_match_to_lines, _user_to_lang_to_count, _lang_list):
     fieldnames = ['name', 'matches', 'lines'] + _lang_list + ['img']
     writer = WriterWrapper('../Data/Users_' + _multi_lang_chat_data_loader.info, _fieldnames=fieldnames)
-    for user, match_to_lines in _sorted_user_to_match_to_lines:
+    for _user, _match_to_lines in _sorted_user_to_match_to_lines:
         row = {
-            'name': user.name,
-            'img': user.img,
-            'matches': len(match_to_lines.keys()),
-            'lines': sum([len(x) for x in match_to_lines.values()]),
+            'name': _user.name,
+            'img': _user.img,
+            'matches': len(_match_to_lines.keys()),
+            'lines': sum([len(x) for x in _match_to_lines.values()]),
         }
-        row.update(_user_to_lang_to_count[user])
+        row.update(_user_to_lang_to_count[_user])
         writer.write_row(row)
+
+
+def query_match_to_lines_of_user(target_user: YoutubeUser or str,
+                                 _user_to_match_to_lines: Dict[YoutubeUser, Dict[tuple, list]]):
+    if isinstance(target_user, str):
+        for user, match_to_lines in _user_to_match_to_lines.items():
+            if user.pseudo_eq(target_user):
+                return match_to_lines
+    else:
+        raise NotImplementedError
 
 
 if __name__ == '__main__':
@@ -89,8 +107,8 @@ if __name__ == '__main__':
     lang_list = multi_lang_chat_data_loader.get_lang_list()['message_lang']
     sorted_user_to_match_to_lines = sorted(user_to_match_to_lines.items(), key=lambda x: -len(x[1].keys()))
     user_to_lang_to_count = get_user_to_lang_to_count(lang_list, sorted_user_to_match_to_lines)
-    
-    MODE = 'STATS'
+
+    MODE = 'QUERY'
     if MODE == 'STATS':
         export_user_stats(
             multi_lang_chat_data_loader,
@@ -98,3 +116,11 @@ if __name__ == '__main__':
             user_to_lang_to_count,
             lang_list
         )
+
+    elif MODE == 'QUERY':
+        user_something = 'Elena Yatkina'
+        match_to_lines_of_user = query_match_to_lines_of_user(user_something, user_to_match_to_lines)
+        for match, lines in match_to_lines_of_user.items():
+            print('# ' + '_'.join(map(str, match)))
+            for line in lines:
+                print('\t', line['lang_message'], line['message'])
