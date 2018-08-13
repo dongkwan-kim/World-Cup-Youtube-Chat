@@ -2,7 +2,7 @@ from custom_path import DATA_PATH
 from DataLoader import MultiChatDataLoader
 from utill import get_files_with_dir_path, try_except, have_enough_words, iso2sec
 from WriterWrapper import WriterWrapper
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Dict
 from collections import OrderedDict
 from termcolor import cprint, colored
 from collections import Counter, defaultdict
@@ -101,6 +101,19 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
     def is_dump_possible(self):
         return self.get_file_name_to_dump_and_load() not in os.listdir(DATA_PATH)
 
+    def get_lang_list(self) -> Dict[str, list]:
+        lang_key_to_counter = defaultdict(lambda: Counter())
+        for key, match_to_counter in self.get_stats().items():
+            for _, counter in match_to_counter.items():
+                lang_key_to_counter[key] += counter
+
+        lang_key_to_list = defaultdict(list)
+        for key, lst in lang_key_to_counter.items():
+            lang_key_to_list[key] = [lang for lang, _ in sorted(
+                lang_key_to_counter[key].items(), key=lambda x: -x[1]
+            )] + ['']
+        return lang_key_to_list
+
     def get_stats(self):
         author_lang_dict = defaultdict(list)
         message_lang_dict = defaultdict(list)
@@ -117,11 +130,12 @@ class MultiLangChatDataLoader(MultiChatDataLoader):
     def export_stats(self):
         stats = self.get_stats()
         for name, lang_dict in stats.items():
-            lines, fieldnames = [], []
+            lines = []
+            total_counter = Counter()
             for match, counter in lang_dict.items():
                 lines.append({'match': match, **dict(counter)})
-                fieldnames += list(counter.keys())
-            fieldnames = ['match'] + [lang for lang, _ in sorted(list(Counter(fieldnames).items()), key=lambda x: -x[1])]
+                total_counter += counter
+            fieldnames = ['match'] + [lang for lang, _ in sorted(list(total_counter.items()), key=lambda x: -x[1])]
 
             writer = WriterWrapper(os.path.join(DATA_PATH, 'lang_dist_{}'.format(name)), fieldnames)
             for line_dict in lines:
@@ -215,7 +229,7 @@ if __name__ == '__main__':
     if multi_lang_chat_data_loader.is_dump_possible():
         multi_lang_chat_data_loader.dump()
 
-    MODE = 'PLOT'
+    MODE = 'STATS'
     if MODE == 'PLOT':
         multi_lang_chat_data_loader.plot_match_to_series({
             'num_of_plots': 3,
