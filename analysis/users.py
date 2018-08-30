@@ -2,9 +2,15 @@ from collections import defaultdict
 from typing import List, Tuple, Dict, Callable
 
 import os
-import sys
 import pickle
+import gensim
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.colors as matcolors
+import numpy as np
+import random
 
+from sklearn.manifold import TSNE
 from custom_path import DATA_PATH
 from lang import MultiLangChatDataLoader, li_classify_str
 from utill import get_files_with_dir_path, have_enough_words
@@ -44,7 +50,7 @@ class YoutubeUser:
 
 
 class YoutubeUserCollection:
-    
+
     def __init__(self, _multi_lang_chat_data_loader: MultiLangChatDataLoader,
                  file_name: str = None, target_path: str = None):
         self.multi_lang_chat_data_loader = _multi_lang_chat_data_loader
@@ -54,6 +60,21 @@ class YoutubeUserCollection:
 
         self.user_to_match_to_lines = self.get_user_to_match_to_lines()
         self.user_to_lang_to_count = self.get_user_to_lang_to_count()
+
+    def __iter__(self):
+
+        def default_message_criteria_func(message: str):
+            criteria = len(message.split()) >= 5 or \
+                       (message and sorted(map(len, message.split())).pop() >= 7)
+            return criteria
+
+        message_criteria_func: Callable = default_message_criteria_func
+
+        for data_loader in self.multi_lang_chat_data_loader:
+            yield [';'.join([
+                str(YoutubeUser(line_dict['author_name'], line_dict['img'])),
+                line_dict['lang_message']
+            ]) for line_dict in data_loader if message_criteria_func(line_dict['message'])]
 
     def dump(self, file_name: str = None, target_path: str = None):
         file_name = file_name or 'YoutubeUserCollection_{}.pkl'.format(self.multi_lang_chat_data_loader.info)
@@ -139,6 +160,46 @@ class YoutubeUserCollection:
             raise NotImplementedError
 
 
+def display_tsne(gensim_model, word_list, vector_size=100,
+                 size=2, legend_size=6.7):
+    arr = np.empty((0, vector_size), dtype='f')
+    lang_list = []
+    for i, word in enumerate(word_list):
+        word_vector = gensim_model[word]
+        lang_list.append(word.split(';')[1])
+        arr = np.append(arr, np.array([word_vector]), axis=0)
+
+    lang_to_color = dict((lang, '#' + "%06x" % random.randint(0, 0xFFFFFF))
+                         for i, lang in enumerate(set(lang_list)))
+
+    colors = np.empty(0, dtype='f')
+    for word in word_list:
+        lang = word.split(';')[1]
+        colors = np.append(colors, lang_to_color[lang])
+
+    # find tsne coords for 2 dimensions
+    tsne = TSNE(n_components=2, random_state=0)
+    np.set_printoptions(suppress=True)
+    y = tsne.fit_transform(arr)
+
+    x_coord = y[:, 0]
+    y_coord = y[:, 1]
+
+    plt.scatter(x_coord, y_coord, c=colors, s=size, label=lang_list)
+
+    # Legend
+    recs = []
+    classes = []
+    for lang, color in lang_to_color.items():
+        classes.append(lang)
+        recs.append(mpatches.Rectangle((0, 0), 1, 1, color=color))
+    plt.legend(recs, classes, prop={'size': legend_size})
+
+    plt.xlim(x_coord.min() + 0.00005, x_coord.max() + 0.00005)
+    plt.ylim(y_coord.min() + 0.00005, y_coord.max() + 0.00005)
+    plt.show()
+
+
 if __name__ == '__main__':
 
     description_files = get_files_with_dir_path(DATA_PATH, 'Description')
@@ -152,19 +213,20 @@ if __name__ == '__main__':
 
     if multi_lang_chat_data_loader.is_dump_possible():
         multi_lang_chat_data_loader.dump()
-    
+
     user_collection = YoutubeUserCollection(multi_lang_chat_data_loader)
     user_collection.dump()
 
-    MODE = 'QUERY'
+    MODE = 'USER_AND_MSG_LANG_TO_VECTOR'
+
     if MODE == 'STATS':
         def major(d):
             return (d['lines'] >= 10) and (d['matches'] >= 2)
 
+
         user_collection.export_user_stats(criteria_func=major)
 
     elif MODE == 'QUERY':
-        user_something = ''
         # user_something = 'Anônimo Tutoriais'
         # user_something = 'Jonata Araujo'
         # user_something = 'Carlos Botelho'
@@ -183,3 +245,19 @@ if __name__ == '__main__':
             for line in lines:
                 print('\t', line['lang_message'], line['message'])
         print('lang_author_name: {}'.format(line['lang_author_name']))
+
+    elif MODE == 'USER_AND_MSG_LANG_TO_VECTOR':
+        list_user_collection = [list(x) for x in user_collection]
+
+        model = gensim.models.Word2Vec(
+            list_user_collection,
+            min_count=11,
+        )
+        model.train(
+            list_user_collection,
+            total_examples=model.corpus_count,
+            epochs=model.epochs,
+        )
+
+        print(len(model.wv.vocab))
+        display_tsne(model, list(model.wv.vocab))
